@@ -70,8 +70,7 @@ class Command_rename extends Command
 		if($newpage->isexist()){
 			return false;
 		}
-		$db = DataBase::getinstance();
-		$db->begin();
+        $db = KinoWiki::getDatabase();
 		
 		$mail = Mail::getinstance();
 		$old = $mail->setsending(false);
@@ -82,14 +81,13 @@ class Command_rename extends Command
 		try{
 			Attach::getinstance($page)->move($newpage);
 		}
-		catch(DBException $e){
-			$db->rollback();
+		catch(Exception $e){
+			$db->rollBack();
 			return false;
 		}
 		
 		$this->notify(array($page, $newpage));
 		$this->mail($page, $newpage);
-		$db->commit();
 		return true;
 	}
 

@@ -43,20 +43,21 @@ class Search
 	 */
 	function normalsearch($word, $andsearch = true)
 	{
-		$db = DataBase::getinstance();
-		
-		for($i = 0; $i < count($word); $i++){
-			$_word[] = $db->escape($word[$i]);
-		}
-		
+        $db = KinoWiki::getDatabase();
+
 		$andor = $andsearch ? 'AND' : 'OR';
-		$query  = "SELECT pagename FROM page";
-		$query .= " WHERE";
-		$query .= "  (pagename like '%" . join("%' $andor pagename like '%", $_word) . "%')";
-		$query .= "  OR";
-		$query .= "  (source like '%" . join("%' $andor source like '%", $_word) . "%')";
-		$query .= " ORDER BY pagename ASC";
-		return $this->_search($query);
+        $sql = 'SELECT pagename FROM page WHERE (pagename like ?'. implode(" $andor pagename like ?"). ')';
+        $sql .= ' OR (source like ?'. implode(" $andor pagename like ?"). ') ORDER BY pagename ASC';
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array_fill(0, count($word) * 2, "%$word%"));
+
+        $ret = array();
+        while ($row = $stmt->fetch()) {
+            $ret[] = $row['pagename'];
+        }
+        $stmt = null;
+        return $ret;
 	}
 	
 	
@@ -86,6 +87,10 @@ class Search
 	 */
 	function eregsearch($word, $andsearch = true)
 	{
+        return array();
+
+        // TODO: SQLite に依存しない形にする
+        /**
 		$db = DataBase::getinstance();
 		
 		for($i = 0; $i < count($word); $i++){
@@ -100,6 +105,7 @@ class Search
 		$query .= "  (php('mb_ereg', '" . join("', source) $andor php('mb_ereg', '", $_word) . "', source))";
 		$query .= " ORDER BY pagename ASC";
 		return $this->_search($query);
+        */
 	}
 	
 	
@@ -112,10 +118,15 @@ class Search
 	 */
 	function timesearch($from, $to)
 	{
-		$query  = "SELECT pagename FROM page";
-		$query .= " WHERE ($from <= timestamp AND timestamp <= $to)";
-		$query .= " ORDER BY timestamp DESC";
-		return $this->_search($query);
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT pagename FROM page WHERE ? <= timestamp AND timestamp <= ? ORDER BY timestamp DESC');
+        $stmt->execute(array($from, $to));
+
+        $ret = array();
+        while ($row = $stmt->fetch()) {
+            $ret[] = $row['pagename'];
+        }
+        return $ret;
 	}
 	
 	
@@ -126,13 +137,12 @@ class Search
 	 */
 	protected function _search($query)
 	{
-		$db = DataBase::getinstance();
-		$result = $db->query($query);
-		$ret = array();
-		while($row = $db->fetch($result)){
-			$ret[] = $row['pagename'];
-		}
-		return $ret;
+        $db = KinoWiki::getDatabase();
+        $ret = array();
+        foreach ($db->query($query) as $row) {
+            $ret[] = $row['pagename'];
+        }
+        return $ret;
 	}
 	
 	

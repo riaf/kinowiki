@@ -21,6 +21,10 @@ class Plugin_bbs extends Plugin
 	
 	function do_url()
 	{
+        exit;
+
+        // TODO: SQLite に依存しない形にする
+        /**
 		if(!isset(Vars::$post['bbsname']) || Vars::$post['bbsname'] == ''){
 			throw new PluginException('パラメータが足りません。', $this);
 		}
@@ -44,6 +48,7 @@ class Plugin_bbs extends Plugin
 		$page->write($smarty->fetch('bbs.tpl'));
 		setcookie('name', $name, time()+60*60*24*30);
 		redirect($page);
+        */
 	}
 	
 	

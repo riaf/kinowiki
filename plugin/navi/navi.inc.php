@@ -17,19 +17,17 @@ class Plugin_navi extends Plugin
 		if($home->isnull()){
 			throw new PluginException('パラメータが正しくありません', $this);
 		}
-		
-		$db = DataBase::getinstance();
-		$_home = $db->escape($home->getpagename());
-		$query  = "SELECT pagename FROM page";
-		$query .= " WHERE pagename like '{$_home}/%'";
-		$query .= " ORDER BY pagename ASC";
-		$result = $db->query($query);
-		
-		$list = array();
-		while($row = $db->fetch($result)){
-			$list[] = $row['pagename'];
-		}
-		if($list == array()){
+
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT pagename FROM page WHERE pagename like ? ORDER BY pagename ASC');
+        $stmt->execute(array($home->getpagename(). '/%'));
+
+        $list = array();
+        while ($row = $stmt->fetch()) {
+            $list[] = $row['pagename'];
+        }
+
+		if (empty($list)) {
 			return '';
 		}
 		natsort($list);

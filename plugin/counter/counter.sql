@@ -1,4 +1,4 @@
-CREATE TABLE plugin_counter(
+CREATE TABLE IF NOT EXISTS plugin_counter(
 	pagename TEXT PRIMARY KEY,
 	total INTEGER,
 	today INTEGER,

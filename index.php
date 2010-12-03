@@ -20,7 +20,7 @@ define('WIKIID', 'index');
 define('SKINFILE', 'default.tpl.htm');
 
 //使用するテーマ。テーマ用ディレクトリ（THEME_DIR）に入れてあるディレクトリ名を指定。
-define('THEME', 'default');
+define('THEME', 'hatena-green');
 
 //パスワード。md5()で括るか、md5で暗号化したものをセットする。
 define('ADMINPASS', md5('password'));

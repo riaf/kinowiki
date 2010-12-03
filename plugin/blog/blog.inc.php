@@ -77,16 +77,14 @@ class Plugin_blog extends Plugin
 	 */
 	protected function getform()
 	{
-		$db = DataBase::getinstance();
-		$_categorypagename = $db->escape($this->categorypagename);
-		$query  = "SELECT pagename FROM page";
-		$query .= " WHERE pagename like '{$_categorypagename}/%'";
-		$query .= " ORDER BY pagename ASC";
-		$result = $db->query($query);
+        $db = KinoWiki::getDatabase();
+
+        $stmt = $db->prepare('SELECT pagename FROM page WHERE pagename like ? ORDER BY pagename ASC');
+        $stmt->execute(array($this->categorypagename));
 		$categorybutton = array();
 		$prefix = mb_ereg_quote($this->categorypagename);
 		$exp = "^{$prefix}/(([^/]+).*)$";
-		while($row = $db->fetch($result)){
+		while($row = $stmt->fetch()){
 			mb_ereg($exp, $row['pagename'], $m);
 			$categorybutton[$m[2]][] = $m[1];
 		}
@@ -249,12 +247,11 @@ class Plugin_blog extends Plugin
 		$source = $smarty->fetch('blog.tpl');
 		
 		//autolsプラグインと衝突しないように、書き込み順に注意。
-		DataBase::getinstance()->begin();
+        $db = KinoWiki::getDatabase();
 		$this->_write_datepage();
 		Page::getinstance($this->pagename)->write($source);
 		$this->_write_category();
 		$this->_write_continue();
-		DataBase::getinstance()->commit();
 	}
 	
 	

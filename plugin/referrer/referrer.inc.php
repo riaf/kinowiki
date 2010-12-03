@@ -9,12 +9,8 @@ class Plugin_referrer extends Plugin
 {
 	function init()
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		if(!$db->istable('plugin_referrer')){
-			$db->exec(file_get_contents(PLUGIN_DIR . 'referrer/referrer.sql'));
-		}
-		$db->commit();
+        $db = KinoWiki::getDatabase();
+        $db->exec(file_get_contents(PLUGIN_DIR . 'referrer/referrer.sql'));
 		
 		Command::getCommand('show')->attach($this);
 	}
@@ -40,15 +36,12 @@ class Plugin_referrer extends Plugin
 	{
 		if(isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != ''){
 			if(!mb_ereg('^' . mb_ereg_quote(SCRIPTDIR), $_SERVER['HTTP_REFERER']) && !mb_ereg('^(?:ftp|https?)://[^.]+?/', $_SERVER['HTTP_REFERER'])){
-				$db = DataBase::getinstance();
-				$_url = $db->escape($_SERVER['HTTP_REFERER']);
-				$_pagename = $db->escape($this->getcurrentPage()->getpagename());
-				$db->begin();
-				$db->query("UPDATE plugin_referrer SET count = count + 1 WHERE pagename = '$_pagename' AND url = '$_url'");
-				if($db->changes() == 0){
-					$db->query("INSERT INTO plugin_referrer VALUES('$_pagename', '$_url', 1)");
+                $db = KinoWiki::getDatabase();
+                $stmt = $db->prepare('UPDATE plugin_referrer SET count = count + 1 WHERE pagename=? AND url=?');
+                if (!$stmt->execute(array($this->getcurrentPage()->getpagename(), $_SERVER['HTTP_REFERER']))) {
+                    $stmt = $db->prepare('INSERT INTO plugin_referrer VALUES (?, ?, 1)');
+                    $stmt->execute(array($this->getcurrentPage()->getpagename(), $_SERVER['HTTP_REFERER']));
 				}
-				$db->commit();
 			}
 		}
 	}
@@ -75,15 +68,9 @@ class Plugin_referrer extends Plugin
 	
 	protected function delete($page, $url)
 	{
-		$db = DataBase::getinstance();
-		$_pagename = $db->escape($page->getpagename());
-		foreach($url as $u){
-			$_url[] = $db->escape($u);
-		}
-		$_urls = '"' . join('", "',  $_url) . '"';
-		$query  = 'DELETE FROM plugin_referrer';
-		$query .= " WHERE pagename = \"$_pagename\" AND url IN ($_urls)";
-		$db->query($query);
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('DELETE FROM plugin_referrer WHERE pagename=? AND url IN ('. implode(',', array_fill(0, count($url), '?')). ')');
+        $stmt->execute(array_merge(array($page->getpagename()), $url));
 		
 		$ret['title'] = $page->getpagename() . ' のReferrer';
 		$smarty = $this->getSmarty();
@@ -111,12 +98,10 @@ class Plugin_referrer extends Plugin
 	 */
 	protected function getlist($page)
 	{
-		$db = DataBase::getinstance();
-		$_pagename = $db->escape($page->getpagename());
-		$query  = "SELECT url, count FROM plugin_referrer";
-		$query .= " WHERE pagename = '$_pagename'";
-		$query .= " ORDER BY count DESC";
-		return $db->fetchall($db->query($query));
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT url, count FROM plugin_referrer WHERE pagename=? ORDER BY count DESC');
+        $stmt->execute(array($page->getpagename()));
+        return $stmt->fetchAll();
 	}
 }
 

@@ -1,4 +1,4 @@
-CREATE TABLE plugin_trackback(
+CREATE TABLE IF NOT EXISTS plugin_trackback(
 	num INTEGER PRIMARY KEY,
 	pagename TEXT,
 	title TEXT,
@@ -7,4 +7,4 @@ CREATE TABLE plugin_trackback(
 	blog_name TEXT,
 	timestamp INTEGER
 );
-CREATE INDEX plugin_trackback_index_pagename ON plugin_trackback(pagename);
+CREATE INDEX IF NOT EXISTS plugin_trackback_index_pagename ON plugin_trackback(pagename);

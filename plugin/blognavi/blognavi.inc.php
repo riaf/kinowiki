@@ -71,7 +71,10 @@ class Plugin_blognavi_DateList
 	protected function __construct($home)
 	{
 		$this->home = $home;
+        return;
 		
+        // TODO: SQLite に依存しない形にする
+        /**
 		$db = DataBase::getinstance();
 		$_pattern = $db->escape('^' . mb_ereg_quote($home) . '/\d{4}-\d{2}-\d{2}$');
 		$query  = "SELECT pagename FROM page";
@@ -82,6 +85,7 @@ class Plugin_blognavi_DateList
 			$this->datepage[] = $row['pagename'];
 		}
 		sort($this->datepage);
+        */
 	}
 	
 	

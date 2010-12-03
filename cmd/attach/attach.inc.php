@@ -228,14 +228,13 @@ class Command_attach extends Command implements MyObserver
 	
 	protected function listpage()
 	{
-		$db = DataBase::getinstance();
+		$db = KinoWiki::getDatabase();
 		$smarty = $this->getSmarty();
 		
-		$query = "SELECT DISTINCT pagename FROM attach ORDER BY pagename ASC";
-		$result = $db->query($query);
-		while($row = $db->fetch($result)){
-			$smarty->append('list', $row['pagename']);
-		}
+		$sql = "SELECT DISTINCT pagename FROM attach ORDER BY pagename ASC";
+        foreach ($db->query($sql) as $row) {
+            $smarty->append('list', $row['pagename']);
+        }
 		$ret['title'] = '添付ファイルを持つページ一覧';
 		$ret['body'] = $smarty->fetch('listpage.tpl.htm');
 		return $ret;

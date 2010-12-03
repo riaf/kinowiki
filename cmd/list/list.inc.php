@@ -7,9 +7,12 @@ class Command_list extends Command
 {
 	function do_url()
 	{
-		$db = DataBase::getinstance();
-		
-		$list = $db->fetchsinglearray($db->query('SELECT pagename FROM page'));
+        $db = KinoWiki::getDatabase();
+
+        $list = array();
+        foreach ($db->query('SELECT pagename FROM page') as $row) {
+            $list[] = $row['pagename'];
+        }
 		mb_natcasesort($list);
 		
 		$smarty = $this->getSmarty();
