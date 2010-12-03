@@ -86,7 +86,7 @@ class Page
 	function getnum()
 	{
         $db = KinoWiki::getDatabase();
-        $stmt = $db->prepare('SELECT num FROM purepare WHERE pagename=?');
+        $stmt = $db->prepare('SELECT num FROM purepage WHERE pagename=?');
         $stmt->execute(array($this->pagename));
         $row = $stmt->fetch();
         return $row === false? null: $row['num'];
@@ -163,13 +163,13 @@ class Page
             $stmt = $db->prepare('INSERT INTO purepage (pagename, num, source, timestamp, realtimestamp) VALUES (?, NULL, ?, ?, ?)');
             $stmt->execute(array($this->pagename, $source, $time, $time));
         } else {
-            $stmt = $db->prepare('INSERT INTO pagebackup SELECT NULL, pagename, sourcem timestamp, realtimestamp FROM purepage WHERE pagename=?');
+            $stmt = $db->prepare('INSERT INTO pagebackup SELECT NULL, pagename, source, timestamp, realtimestamp FROM purepage WHERE pagename=?');
             $stmt->execute(array($this->pagename));
 
             $params = array($source);
-            $sql = 'UPDATE purepage SET source=?';
+            $sql = 'UPDATE purepage SET source=?,';
             if (!$notimestamp) {
-                $sql .= ' timestamp=?';
+                $sql .= ' timestamp=?,';
                 $params[] = $time;
             }
             $sql .= ' realtimestamp=? WHERE pagename=?';
