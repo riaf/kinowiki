@@ -17,15 +17,12 @@ function mtime()
 //開始時刻の設定
 define('STARTTIME', mtime());
 
-
-
 ini_set('include_path', 'library/' . PATH_SEPARATOR . ini_get('include_path'));
 ini_set('include_path', 'library/pear/' . PATH_SEPARATOR . ini_get('include_path'));
 
 //require_once('errorhandler.inc.php');
 require_once('exception.inc.php');
 require_once('func.inc.php');
-require_once('database.inc.php');
 require_once('notifier.inc.php');
 require_once('attach.inc.php');
 require_once('autolink.inc.php');
@@ -62,7 +59,7 @@ class KinoWiki
 	 * @var	Controller
 	 */
 	protected $controller;
-	
+
 	/**
 	 * 実行中のPageを取得する。
 	 * @return Page
@@ -146,6 +143,15 @@ class KinoWiki
 		}
 	}	
 	
+    static public function getDatabase()
+    {
+        static $pdo;
+        if ($pdo instanceof PDO === false) {
+            $pdo = new PDO('sqlite:'. DATA_DIR. WIKIID. '.db');
+        }
+        return $pdo;
+    }
+
 	/**
 	 * コンストラクタ
 	 */
@@ -231,11 +237,14 @@ class KinoWiki
 	 */
 	private static function installcheck()
 	{
-		$db = DataBase::getinstance();
-		if($db->istable('purepage')){
-			return true;
-		}
-		else{
+        $db = self::getDatabase();
+        $stmt = $db->prepare('SELECT name FROM'
+            .' (SELECT name FROM sqlite_master WHERE type=\'table\' UNION ALL'
+            .' SELECT name FROM sqlite_temp_master WHERE type=\'table\') WHERE name=?');
+        $stmt->execute(array('purepage'));
+        if ($stmt->fetch()) {
+            return true;
+        } else {
 			$db->exec(file_get_contents(HIDEABLE_DIR . 'sql/kinowiki.sql'));
 			$dir = opendir(HIDEABLE_DIR . '/sql');
 			while(($filename = readdir($dir)) !== false){
@@ -246,7 +255,7 @@ class KinoWiki
 				$db->exec(file_get_contents($path));
 			}
 			return false;
-		}
+        }
 	}
 	
 	

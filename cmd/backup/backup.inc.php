@@ -44,13 +44,11 @@ class Command_backup extends Command
 			$ret['pagename'] = $page->getpagename();
 		}
 		else{
-			$db = DataBase::getinstance();
-			$query  = "SELECT DISTINCT pagename FROM pagebackup ORDER BY pagename ASC";
-			$result = $db->query($query);
-			$list = array();
-			while($row = $db->fetch($result)){
-				$list[] = $row['pagename'];
-			}
+            $db = KinoWiki::getDatabase();
+			$sql  = "SELECT DISTINCT pagename FROM pagebackup ORDER BY pagename ASC";
+            foreach ($db->query($sql) as $row) {
+                $list[] = $row['pagename'];
+            }
 			$smarty = $this->getSmarty();
 			$smarty->assign('list', $list);
 			$ret['title'] = 'バックアップ一覧';

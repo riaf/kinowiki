@@ -21,6 +21,10 @@ class Plugin_blogrss10 extends Plugin
 	
 	public function do_url()
 	{
+        exit;
+
+        // TODO: SQLite に依存しない形にする
+        /**
 		if(!isset(Vars::$get['blogname']) || trim(Vars::$get['blogname']) == ''){
 			throw new PluginException('パラメータが足りません。', $this);
 		}
@@ -55,6 +59,7 @@ class Plugin_blogrss10 extends Plugin
 		header('Last-Modified: ' . gmdate( 'D, d M Y H:i:s', $item['timestamp'][0] ) . ' GMT' );
 		$smarty->display('blogrss10.tpl.htm');
 		exit();
+        */
 	}
 }
 

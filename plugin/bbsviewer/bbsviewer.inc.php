@@ -7,6 +7,10 @@ class Plugin_bbsviewer extends Plugin
 {
 	function do_block($page, $param1, $param2)
 	{
+        return '';
+
+        // TODO: SQLite に依存しない形にする
+        /**
 		if(!mb_ereg('^\s*(.+?)\s*,\s*(\d+)\s*$', $param1, $m) || $m[2] <= 0){
 			throw new PluginException('引数が正しくありません。', $this);
 		}
@@ -35,6 +39,7 @@ class Plugin_bbsviewer extends Plugin
 		$smarty->assign('prev', $p + 1);
 		$smarty->assign('body', join("\n", $ret));
 		return $smarty->fetch('bbsviewer.tpl.htm');
+        */
 	}
 	
 	

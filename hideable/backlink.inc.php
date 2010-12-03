@@ -51,16 +51,14 @@ class BackLink implements MyObserver
 	 */
 	function getlist($page)
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($page->getpagename());
-		$query  = "SELECT linker,times FROM linklist";
-		$query .= " WHERE linked = '$_pagename'";
-		$query .= " ORDER BY times DESC, linker ASC";
-		
-		$result = $db->query($query);
+        $db = KinoWiki::getDatabase();
+
+        $sql = 'SELECT linker, times FROM linklist WHERE linked=? ORDER BY times DESC, linker ASC';
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array($page->getpagename()));
+
 		$ret = array();
-		while($row = $db->fetch($result)){
+		while($row = $stmt->fetch()){
 			$ret[] = array('pagename' => $row['linker'], 'times' => $row['times']);
 		}
 		return $ret;
@@ -90,28 +88,23 @@ class BackLink implements MyObserver
 		if($linker->ishidden()){
 			return;
 		}
-		
-		$db = DataBase::getinstance();
-		$db->begin();
-		
+
+        $db = KinoWiki::getDatabase();
+
 		$body = parse_Page($linker);
 		$seeker = new LinkSeeker($linker);
 		$body->accept($seeker);
 		$list = $seeker->getlist();
-		
-		$_linker = $db->escape($linker->getpagename());
-		$db->query("DELETE FROM linklist WHERE linker = '$_linker'");
-		
+
+        $stmt = $db->prepare('DELETE FROM linklist WHERE linker=?');
+        $stmt->execute(array($linker->getpagename()));
+
+        $stmt = $db->prepare('INSERT INTO linklist (linker, linked, times) VALUES (?, ?, ?)');
 		foreach($list as $linkedname => $times){
 			if($linker->getpagename() != $linkedname){
-				$_linked = $db->escape($linkedname);
-				$query  = "INSERT INTO linklist (linker, linked, times)";
-				$query .= " VALUES('$_linker', '$_linked', $times)";
-				$db->query($query);
+                $stmt->execute(array($linker->getpagename(), $linkedname, $times));
 			}
 		}
-		
-		$db->commit();
 	}
 	
 	
@@ -122,20 +115,16 @@ class BackLink implements MyObserver
 	 */
 	function refreshlinked($linked)
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		
-		$_linked = $db->escape($linked->getpagename());
-		$db->query("DELETE FROM linklist WHERE linked  = '$_linked'");
-		
-		$query  = "SELECT pagename FROM page";
-		$query .= " WHERE (source like '%${_linked}%')";
-		$result = $db->query($query);
-		while($row = $db->fetch($result)){
-			$this->refreshlinker(Page::getinstance($row['pagename']));
-		}
-		
-		$db->commit();
+        $db = KinoWiki::getDatabase();
+
+        $stmt = $db->prepare('DELETE FROM linklist WHERE linked=?');
+        $stmt->execute(array($linked->getpagename()));
+
+        $stmt = $db->prepare('SELECT pagename FROM page WHERE source like ?');
+        $stmt->execute(array('%'. $linked->getpagename(). '%'));
+        while ($row = $stmt->fetch()) {
+            $this->refreshlinker(Page::getinstance($row['pagename']));
+        }
 	}
 	
 	
@@ -144,17 +133,12 @@ class BackLink implements MyObserver
 	 */
 	function refreshall()
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		
-		$db->query("DELETE FROM linklist");
-		
-		$result = $db->query("SELECT pagename FROM page");
-		while($row = $db->fetch($result)){
-			$this->refreshlinker(Page::getinstance($row['pagename']));
-		}
-		
-		$db->commit();
+        $db = KinoWiki::getDatabase();
+
+        $db->query('DELETE FROM linklist');
+        foreach ($db->query('SELECT pagename FROM page') as $row) {
+            $this->refreshlinker(Page::getinstance($row['pagename']));
+        }
 	}
 }
 

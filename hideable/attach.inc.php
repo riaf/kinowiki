@@ -56,17 +56,16 @@ class Attach
 	 */
 	function getlist()
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->page->getpagename());
-		$query  = "SELECT filename FROM attach WHERE pagename = '$_pagename'";
-		$query .= " ORDER BY filename ASC";
-		$result = $db->query($query);
-		$ret = array();
-		while($row = $db->fetch($result)){
-			$ret[] = $row['filename'];
-		}
-		return $ret;
+        $db = KinoWiki::getDatabase();
+
+        $stmt = $db->prepare('SELECT filename FROM attach WHERE pagename=? ORDER BY filename ASC');
+        $stmt->execute(array($this->page->getpagename()));
+        $ret = array();
+        while ($row = $stmt->fetch()) {
+            $ret[] = $row['filename'];
+        }
+        $stmt = null;
+        return $ret;
 	}
 	
 	
@@ -79,21 +78,15 @@ class Attach
 	 */
 	function rename($old, $new)
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->page->getpagename());
-		$_old = $db->escape($old);
-		$_new = $db->escape($new);
-		$query  = "UPDATE OR IGNORE attach SET filename = '$_new'";
-		$query .= " WHERE (pagename = '$_pagename' AND filename = '$_old')";
-		$db->query($query);
-		if($db->changes() != 0){
-			$this->notify(array('rename', $old, $new));
-			return true;
-		}
-		else{
-			return false;
-		}
+        $db = KinoWiki::getDatabase();
+
+        $stmt = $db->prepare('UPDATE OR IGNORE attach SET filename=? WHERE pagename=? AND filename=?');
+        $status = (bool) $stmt->execute(array($new, $this->page->getpagename(), $old));
+        if ($status) {
+            $this->notify(array('rename', $old, $new));
+        }
+
+        return $status;
 	}
 	
 	
@@ -105,14 +98,12 @@ class Attach
 	 */
 	function isexist($filename)
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->page->getpagename());
-		$_filename = $db->escape($filename);
-		$query  = "SELECT count(*) FROM attach";
-		$query .= " WHERE (pagename = '$_pagename' AND filename = '$_filename')";
-		$row = $db->fetch($db->query($query));
-		return $row[0] == 1;
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT count(*) c FROM attach WHERE parename=? AND filename=?');
+        $stmt->execute($this->page->getpagename(), $filename);
+        $row = $stmt->fetch();
+
+        return $row['c'] == 1;
 	}
 	
 	
@@ -125,15 +116,9 @@ class Attach
 	 */
 	function move($newpage)
 	{
-		$db = DataBase::getinstance();
-		
-		$from = $this->page->getpagename();
-		$to = $newpage->getpagename();
-		$_from = $db->escape($from);
-		$_to = $db->escape($to);
-		$query  = "UPDATE attach SET pagename = '$_to'";
-		$query .= " WHERE pagename = '$_from'";
-		$db->fetch($db->query($query));
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('UPDATE attach SET pagename=? WHERE pagename=?');
+        $stmt->execute(array($newpage, $this->page->getpagename()));
 		$this->notify(array('move', $from, $to));
 	}
 }
@@ -198,24 +183,16 @@ class AttachedFile
 	 */
 	function set($bin)
 	{
-		$db = DataBase::getinstance();
-		
-		$_filename = $db->escape($this->filename);
-		$_pagename = $db->escape($this->page->getpagename());
-		$_data = $db->escape($bin);
-		$_size = strlen($bin);
-		$_time = time();
-		$query  = "INSERT OR IGNORE INTO attach";
-		$query .= " (pagename, filename, binary, size, timestamp, count)";
-		$query .= " VALUES('$_pagename', '$_filename', '$_data', $_size, $_time, 0)";
-		$db->query($query);
-		if($db->changes() != 0){
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare(
+            'INSERT OR IGNORE INTO attach (pagename, filename, binary, size, timestamp, count)'
+            . ' VALUES(?, ?, ?, ?, ?, 0)'
+        );
+        if ($stmt->execute($this->page->getpagename(), $this->filename, $bin, strlen($bin), time())) {
 			$this->notify(array('attach'));
-			return true;
-		}
-		else{
-			return false;
-		}
+            return true;
+        }
+        return false;
 	}
 	
 	
@@ -224,16 +201,10 @@ class AttachedFile
 	 */
 	function delete()
 	{
-		$db = DataBase::getinstance();
-		
-		$count = $this->getcount();
-		
-		$_filename = $db->escape($this->filename);
-		$_pagename = $db->escape($this->page->getpagename());
-		$query  = "DELETE FROM attach";
-		$query .= " WHERE (pagename = '$_pagename' AND filename = '$_filename')";
-		$db->query($query);
-		$this->notify(array('delete', $count));
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('DELETE FROM attach WHERE pagename=? AND filename=?');
+        $stmt->execute(array($this->page->getpagename(), $this->filename));
+		$this->notify(array('delete', $this->count()));
 	}
 	
 	
@@ -245,22 +216,18 @@ class AttachedFile
 	 */
 	function getdata($count = false)
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		
-		$_filename = $db->escape($this->filename);
-		$_pagename = $db->escape($this->page->getpagename());
-		
-		$query  = "SELECT binary FROM attach";
-		$query .= " WHERE (pagename = '$_pagename' AND filename = '$_filename')";
-		$row = $db->fetch($db->query($query));
-		if($count){
-			$query  = "UPDATE attach SET count = count + 1";
-			$query .= " WHERE (pagename = '$_pagename' AND filename = '$_filename')";
-			$db->query($query);
-		}
-		$db->commit();
-		return $row != false ? $row['binary'] : null;
+        $db = KinoWiki::getDatabase();
+
+        $stmt = $db->prepare('SELECT binary FROM attach WHERE pagename=? AND filename=?');
+        $stmt->execute(array($this->page->getpagename(), $this->filename));
+        $row = $stmt->fetch();
+
+        if ($count) {
+            $stmt = $db->prepare('UPDATE attach SET count = count + 1 WHERE pagename=? AND filename=?');
+            $stmt->execute(array($this->page->getpagename(), $this->filename));
+        }
+
+		return isset($row['binary'])? $row['binary']: null;
 	}
 	
 	
@@ -296,15 +263,11 @@ class AttachedFile
 	
 	protected function getcol($col)
 	{
-		$db = DataBase::getinstance();
-		
-		$_filename = $db->escape($this->filename);
-		$_pagename = $db->escape($this->page->getpagename());
-		
-		$query  = "SELECT $col FROM attach";
-		$query .= " WHERE (pagename = '$_pagename' AND filename = '$_filename')";
-		$row = $db->fetch($db->query($query));
-		return $row != false ? $row[$col] : false;
+        $db = KinoWiki::getDatabase();
+        $stmt->prepare("SELECT $col FROM attach WHERE pagename=? AND filename=?");
+        $stmt->execute(array($this->page->getpagename(), $this->filename));
+        $row = $stmt->fetch();
+        return isset($row[$col])? $row[$col]: false;
 	}
 }
 

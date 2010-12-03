@@ -84,15 +84,15 @@ class FuzzyLink
 	function getexpression()
 	{
 		if(empty($this->expression)){
-			$db = DataBase::getinstance();
-			
-			$result = $db->query("SELECT data FROM cache WHERE key = 'fuzzylink_exp'");
-			$row = $db->fetch($result);
+            $db = KinoWiki::getDatabase();
+			$stmt = $db->query("SELECT data FROM cache WHERE key = 'fuzzylink_exp'");
+            $row = $stmt->fetch();
+
 			if($row == false){
 				$list = $this->listup();
 				$exp = $list == array() ? '' : '(?:' . join('|', $list) . ')';
-				$_exp = $db->escape($exp);
-				$db->query("INSERT INTO cache VALUES('fuzzylink_exp', '$_exp')");
+                $stmt = $db->prepare('INSERT INTO cache VALUES(\'fuzzylink_exp\', ?)');
+                $stmt->execute(array($exp));
 				$this->expression = $exp;
 			}
 			else{
@@ -110,13 +110,12 @@ class FuzzyLink
 	 */
 	protected function listup()
 	{
-		$db = DataBase::getinstance();
-		$result = $db->query("SELECT DISTINCT exp FROM fuzzylink_list");
-		$list = array();
-		while($row = $db->fetch($result)){
-			$list[] = $row['exp'];
-		}
-		return $list;
+        $db = KinoWiki::getDatabase();
+        $list = array();
+        foreach ($db->query('SELECT DISTINCT exp FROM fuzzylink_list') as $row) {
+            $list[] = $row['exp'];
+        }
+        return $list;
 	}
 	
 	
@@ -148,6 +147,10 @@ class FuzzyLink
 	 */
 	function getpagelist($word)
 	{
+        return array();
+
+        // TODO: sqlite に依存しない形で書きなおす
+        /*
 		$db = DataBase::getinstance();
 		$list = array();
 		$_word = $db->escape($word);
@@ -161,6 +164,7 @@ class FuzzyLink
 			$ret[] = Page::getinstance($pagename);
 		}
 		return $ret;
+        */
 	}
 	
 	
@@ -189,7 +193,7 @@ class FuzzyLink
 	 */
 	protected function refresh()
 	{
-		$db = DataBase::getinstance();
+        $db = KinoWiki::getDatabase();
 		$db->query("DELETE FROM cache WHERE key = 'fuzzylink_exp'");
 		$this->expression = array();
 	}
@@ -200,18 +204,16 @@ class FuzzyLink
 	 */
 	function restruct()
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
+        $db = KinoWiki::getDatabase();
 		
 		$db->query('DROP TABLE fuzzylink_list');
 		$db->exec(file_get_contents(HIDEABLE_DIR . 'sql/fuzzylink.sql'));
-		$result = $db->query('SELECT pagename FROM page');
-		while($row = $db->fetch($result)){
+
+        foreach ($db->query('SELECT pagename FROM page') as $row) {
 			$this->addpage(Page::getinstance($row['pagename']));
-		}
+        }
+
 		$this->refresh();
-		
-		$db->commit();
 	}
 	
 	
@@ -231,14 +233,12 @@ class FuzzyLink
 			$name = $page->getpagename();
 		}
 		
-		$db = DataBase::getinstance();
-		$_pagename = $db->escape($page->getpagename());
-		$db->begin();
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('INSERT INTO fuzzylink_list VALUES (?, ?)');
+        $pagename = $page->getpagename();
 		foreach(FuzzyFunc::makefuzzyexplist($name) as $exp){
-			$_exp = $db->escape($exp);
-			$db->query("INSERT INTO fuzzylink_list VALUES('$_exp', '$_pagename')");
+            $stmt->execute(array($exp, $pagename));
 		}
-		$db->commit();
 	}
 	
 	
@@ -247,9 +247,9 @@ class FuzzyLink
 	 */
 	protected function delpage($page)
 	{
-		$db = DataBase::getinstance();
-		$_pagename = $db->escape($page->getpagename());
-		$db->query("DELETE FROM fuzzylink_list WHERE pagename = '$_pagename'");
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('DELETE FROM fuzzylink_list WHERE pagename=?');
+        $stmt->execute(array($page->getpagename()));
 	}
 }
 

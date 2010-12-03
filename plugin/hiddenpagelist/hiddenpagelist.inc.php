@@ -7,14 +7,17 @@ class Plugin_hiddenpagelist extends Plugin
 {
 	function do_block($page, $param1, $param2)
 	{
-		$db = DataBase::getinstance();
+        $db = KinoWiki::getDatabase();
 		$query  = "SELECT pagename FROM allpage";
 		$query .= " WHERE pagename LIKE ':%' OR pagename LIKE '%/:%";
 		$query .= " ORDER BY pagename ASC";
-		$result = $db->query($query);
-		
-		$list = $db->fetchsinglearray($result);
-		if($list == array()){
+
+        $list = array();
+        foreach ($db->query($query) as $row) {
+            $list[] = $row['pagename'];
+        }
+
+		if (empty($list)) {
 			return '';
 		}
 		natsort($list);

@@ -7,6 +7,10 @@ class Plugin_recent extends Plugin
 {
 	function do_block($page, $param1, $param2)
 	{
+        return '';
+
+        // TODO: SQLite に依存しない形にする
+        /**
 		$num = (int)trim($param1) > 0 ? (int)trim($param1) : 15;
 		$exp = array();
 		foreach(array_map('trim', explode("\n", $param2)) as $s){
@@ -32,6 +36,7 @@ class Plugin_recent extends Plugin
 		$smarty = $this->getSmarty();
 		$smarty->assign('list', $list);
 		return $smarty->fetch('recent.tpl.htm');
+        */
 	}
 }
 

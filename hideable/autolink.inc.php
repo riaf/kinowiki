@@ -76,21 +76,21 @@ class AutoLink
 	function getexpression($dir = '')
 	{
 		if(!isset($this->expression[$dir])){
-			$db = DataBase::getinstance();
-			
-			$_dir = $db->escape($dir);
-			$result = $db->query("SELECT exp FROM autolink WHERE dir = '$_dir'");
-			$row = $db->fetch($result);
-			if($row == false){
-				$list = $this->listup($dir);
-				$exp = makelinkexp($list);
-				$_exp = $db->escape($exp);
-				$db->query("INSERT INTO autolink (dir, exp) VALUES('$_dir', '$_exp')");
-				$this->expression[$dir] = $exp;
-			}
-			else{
-				$this->expression[$dir] = $row['exp'];
-			}
+            $db = KinoWiki::getDatabase();
+
+            $stmt = $db->prepare('SELECT exp FROM autolink WHERE dir=?');
+            $stmt->execute(array($dir));
+            $row = $stmt->fetch();
+            if ($row === false) {
+                $list = $this->listup($dir);
+                $exp = makelinkexp($list);
+                $stmt = $db->prepare('INSERT INTO autolink(dir, exp) VALUES(?, ?)');
+                $stmt->execute(array($dir, $exp));
+                $this->expression[$dir] = $exp;
+            } else {
+                $this->expression[$dir] = $row['exp'];
+            }
+            $stmt = null;
 		}
 		return $this->expression[$dir];
 	}
@@ -104,17 +104,19 @@ class AutoLink
 	 */
 	protected function listup($dir)
 	{
-		$db = DataBase::getinstance();
+        $db = KinoWiki::getDatabase();
 		
 		$query = "SELECT pagename FROM page";
 		if($dir != ''){
-			$query .= " WHERE pagename like '" . $db->escape($dir) . "/%'";
+			$query .= " WHERE pagename like ?";
 		}
-		
-		$result = $db->query($query);
+
+        $stmt = $db->prepare($query);
+        $stmt->execute(array("$dir/%"));
+
 		$list = array();
 		if($dir == ''){
-			while($row = $db->fetch($result)){
+			while($row = $stmt->fetch()){
 				if(!$this->isignored($row['pagename'])){
 					$list[] = $row['pagename'];
 				}
@@ -122,7 +124,7 @@ class AutoLink
 		}
 		else{
 			$len = strlen("{$dir}/");
-			while($row = $db->fetch($result)){
+			while($row = $stmt->fetch()){
 				if(!$this->isignored($row['pagename'])){
 					$list[] = substr($row['pagename'], $len);
 				}
@@ -161,7 +163,7 @@ class AutoLink
 	 */
 	function refresh()
 	{
-		$db = DataBase::getinstance();
+        $db = KinoWiki::getDatabase();
 		$db->query("DELETE FROM autolink");
 		$this->expression = array();
 	}

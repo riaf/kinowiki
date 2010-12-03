@@ -10,14 +10,8 @@ class Plugin_rss extends Plugin
 {
 	function init()
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		
-		if(!$db->istable('plugin_rss')){
-			$db->exec(file_get_contents(PLUGIN_DIR . 'rss/rss.sql'));
-		}
-		
-		$db->commit();
+        $db = KinoWiki::getDatabase();
+        $db->exec(file_get_contents(PLUGIN_DIR . 'rss/rss.sql'));
 	}
 	
 	
@@ -35,24 +29,18 @@ class Plugin_rss extends Plugin
 			return $this->getrss($url);
 		}
 		else{
-			$db = DataBase::getinstance();
-			$db->begin();
-			
-			$_url = $db->escape($url);
-			$row = $db->fetch($db->query("SELECT data,time FROM plugin_rss WHERE url = '$_url'"));
-			if($row == false || $row['time'] + $expire * 60 < time()){
+            $db = KinoWiki::getDatabase();
+            $stmt = $db->prepare('SELECT data, time FROM plugin_rss WHERE url=?');
+            $stmt->execute(array($url));
+            $row = $stmt->fetch();
+            if ($row === false || $row['time'] + $expire * 60 < time()) {
 				$data = $this->getrss($url);
-				$_data = $db->escape($data);
-				$query  = "INSERT OR REPLACE INTO plugin_rss (url,data,time)";
-				$query .= " VALUES('$_url', '$_data', " . time() . ")";
-				$db->query($query);
-			}
-			else{
-				$data = $row['data'];
-			}
-			
-			$db->commit();
-			return $data;
+                $stmt = $db->prepare('INSERT OR REPLACE INTO plugin_rss (url, data, time) VALUES (?, ?, ?)');
+                $stmt->execute(array($url, $data, time()));
+            } else {
+                $data = $row['data'];
+            }
+            return $data;
 		}
 	}
 	

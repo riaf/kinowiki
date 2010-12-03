@@ -9,12 +9,8 @@ class Plugin_trackback extends Plugin
 {
 	function init()
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		if(!$db->istable('plugin_trackback')){
-			$db->exec(file_get_contents(PLUGIN_DIR . 'trackback/trackback.sql'));
-		}
-		$db->commit();
+        $db = KinoWiki::getDatabase();
+        $db->exec(file_get_contents(PLUGIN_DIR . 'trackback/trackback.sql'));
 		
 		Command::getCommand('show')->attach($this);
 	}
@@ -102,36 +98,21 @@ class Plugin_trackback extends Plugin
 			$smarty->display('receive_fail.tpl.htm');
 			exit;
 		}
-		
+
 		$page = Page::getinstance(Vars::$get['page']);
 		$title = isset($data['title']) ? $data['title'] : '';
 		$excerpt = isset($data['excerpt']) ? $data['excerpt'] : '';
 		$blog_name = isset($data['blog_name']) ? $data['blog_name'] : '';
 		$url = $data['url'];
-	
-//		$encode = mb_detect_encoding($excerpt . $blog_name . $title);
-//		$title = mb_convert_encoding($title, 'UTF-8', $encode);
-//		$excerpt = mb_convert_encoding($excerpt, 'UTF-8', $encode);
-//		$blog_name = mb_convert_encoding($blog_name, 'UTF-8', $encode);
-		
+
 		$title = mb_strlen($title) >= 64 ? mb_substr($title, 0, 60) . '...' : $title;
 		$excerpt = mb_strlen($excerpt) >= 256 ? mb_substr($excerpt, 0, 252) . '...' : $excerpt;
-		
-		
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($page->getpagename());
-		$_title = $db->escape($title);
-		$_excerpt = $db->escape($excerpt);
-		$_url = $db->escape($url);
-		$_blog_name = $db->escape($blog_name);
-		$_timestamp = time();
-		
-		$query  = "INSERT INTO plugin_trackback";
-		$query .= " (num, pagename, title, excerpt, url, blog_name, timestamp)";
-		$query .= " VALUES(null, '$_pagename', '$_title', '$_excerpt', '$_url', '$_blog_name', $_timestamp)";
-		$db->query($query);
-		
+
+	    $db = KinoWiki::getDatabase();	
+
+        $stmt = $db->prepare('INSERT INTO plugin_trackback (num, pagename, title, excerpt, url, blog_name, timestamp) VALUES (null, ?, ?, ?, ?, ?, ?)');
+        $stmt->execute(array($page->getpagename(), $title, $excerpt, $url, $blog_name, time()));
+
 		$smarty = $this->getSmarty();
 		$smarty->display('receive_success.tpl.htm');
 		exit;
@@ -143,12 +124,10 @@ class Plugin_trackback extends Plugin
 	 */
 	protected function getlist($page)
 	{
-		$db = DataBase::getinstance();
-		$_pagename = $db->escape($page->getpagename());
-		$query  = "SELECT num, title, excerpt, url, blog_name, timestamp FROM plugin_trackback";
-		$query .= " WHERE pagename = '$_pagename'";
-		$query .= " ORDER BY timestamp DESC";
-		return $db->fetchall($db->query($query));
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT num, title, excerpt, url, blog_name, timestamp FROM plugin_trackback WHERE pagename=? ORDER BY timestamp DESC');
+        $stmt->execute(array($page->getpagename()));
+        return $stmt->fetchAll();
 	}
 
 	
@@ -157,12 +136,11 @@ class Plugin_trackback extends Plugin
 	 */
 	protected function countreceived($page)
 	{
-		$db = DataBase::getinstance();
-		$_pagename = $db->escape($page->getpagename());
-		$query  = "SELECT count(*) FROM plugin_trackback";
-		$query .= " WHERE pagename = '$_pagename'";
-		$row = $db->fetch($db->query($query));
-		return $row[0];
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT count(*) c FROM plugin_trackback WHERE pagename=?');
+        $stmt->execute(array($page->getpagename()));
+        $row = $stmt->fetch();
+        return $row['c'];
 	}
 	
 	

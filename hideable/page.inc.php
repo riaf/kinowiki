@@ -54,18 +54,16 @@ class Page
 	 */
 	static function getinstancebynum($num)
 	{
-		$db = DataBase::getinstance();
+        $db = KinoWiki::getDatabase();
 		
 		$_num = (int)$num;
-		$query  = "SELECT pagename FROM purepage";
-		$query .= " WHERE num = '$_num'";
-		$row = $db->fetch($db->query($query));
-		if($row !== false){
-			return self::getinstance($row[0]);
-		}
-		else{
-			throw new FatalException("番号 $_num のページはありません。");
-		}
+        $stmt = $db->prepare('SELECT pagename FROM purepage WHERE num=?');
+        $stmt->execute(array($num));
+        $row = $stmt->fetch();
+        if ($row === false) {
+			throw new FatalException("番号 $num のページはありません。");
+        }
+        return self::getinstance($row['pagename']);
 	}
 	
 	
@@ -87,13 +85,11 @@ class Page
 	 */
 	function getnum()
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->pagename);
-		$query  = "SELECT num FROM purepage";
-		$query .= " WHERE pagename = '$_pagename'";
-		$row = $db->fetch($db->query($query));
-		return $row !== false ? $row[0] : null;
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT num FROM purepare WHERE pagename=?');
+        $stmt->execute(array($this->pagename));
+        $row = $stmt->fetch();
+        return $row === false? null: $row['num'];
 	}
 	
 	
@@ -156,38 +152,34 @@ class Page
 	 */
 	function write($source, $notimestamp = false)
 	{
-		$db = DataBase::getinstance();
-		$db->begin();
-		
-		$_pagename = $db->escape($this->pagename);
-		$_source = $db->escape(mb_ereg_replace('\r?\n', "\n", $source));
-		$_time = time();
-		
-		$query = "SELECT timestamp FROM purepage WHERE pagename = '$_pagename'";
-		if($db->fetch($db->query($query)) !== false){
-			$query  = 'INSERT INTO pagebackup';
-			$query .= ' SELECT NULL, pagename, source, timestamp, realtimestamp';
-			$query .= "  FROM purepage WHERE pagename = '$_pagename'";
-			$db->query($query);
-			
-			$query  = 'UPDATE purepage SET';
-			$query .= "  source = '$_source',";
-			if(!$notimestamp){
-				$query .= "  timestamp = $_time,";
-			}
-			$query .= "  realtimestamp = $_time";
-			$query .= " WHERE pagename = '$_pagename'";
-			$db->query($query);
-		}
-		else{
-			$query  = 'INSERT INTO purepage';
-			$query .= ' (pagename, num, source, timestamp, realtimestamp)';
-			$query .= " VALUES('$_pagename', NULL, '$_source', $_time, $_time)";
-			$db->query($query);
-		}
+        $db = KinoWiki::getDatabase();
+
+        $time = time();
+        $source = preg_replace("/\r?\n/", "\n", $source);
+
+        $stmt = $db->prepare('SELECT timestamp FROM purepage WHERE pagename=?');
+        $stmt->execute(array($this->pagename));
+        if ($stmt->fetch() === false) {
+            $stmt = $db->prepare('INSERT INTO purepage (pagename, num, source, timestamp, realtimestamp) VALUES (?, NULL, ?, ?, ?)');
+            $stmt->execute(array($this->pagename, $source, $time, $time));
+        } else {
+            $stmt = $db->prepare('INSERT INTO pagebackup SELECT NULL, pagename, sourcem timestamp, realtimestamp FROM purepage WHERE pagename=?');
+            $stmt->execute(array($this->pagename));
+
+            $params = array($source);
+            $sql = 'UPDATE purepage SET source=?';
+            if (!$notimestamp) {
+                $sql .= ' timestamp=?';
+                $params[] = $time;
+            }
+            $sql .= ' realtimestamp=? WHERE pagename=?';
+            $params[] = $time;
+            $params[] = $this->pagename;
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+        }
 		
 		$this->notify();
-		$db->commit();
 	}
 	
 	
@@ -196,13 +188,9 @@ class Page
 	 */
 	function deletebackup()
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->pagename);
-		$query  = "DELETE FROM pagebackup";
-		$query .= " WHERE pagename = '$_pagename'";
-		
-		$db->query($query);
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('DELETE FROM pagebackup WHERE pagename=?');
+        $stmt->execute(array($this->pagename));
 	}
 	
 	
@@ -213,14 +201,12 @@ class Page
 	 */
 	function getbackupamount()
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->pagename);
-		$query  = "SELECT count(*) FROM pagebackup";
-		$query .= " WHERE pagename = '$_pagename'";
-		
-		$row = $db->fetch($db->query($query));
-		return $row[0];
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT count(*) c FROM pagebackup WHERE pagename=?');
+        $stmt->execute(array($this->pagename));
+        $row = $stmt->fetch();
+
+        return isset($row['c'])? $row['c']: 0;
 	}
 	
 	
@@ -231,14 +217,10 @@ class Page
 	 */
 	function getbackup()
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->pagename);
-		$query  = "SELECT * FROM pagebackup";
-		$query .= " WHERE pagename = '$_pagename'";
-		$query .= " ORDER BY realtimestamp DESC";
-		
-		return $db->fetchall($db->query($query));
+        $db = KinoWiki::getDatabase();
+        $stmt = $db->prepare('SELECT * FROM pagebackup WHERE pagename=? ORDER BY realtimestamp DESC');
+        $stmt->execute(array($this->pagename));
+        return $stmt->fetchAll();
 	}
 	
 	
@@ -251,21 +233,17 @@ class Page
 	 */
 	protected function getresult($result, $num = 0)
 	{
-		$db = DataBase::getinstance();
-		
-		$_pagename = $db->escape($this->pagename);
-		if($num == 0){
-			$query  = "SELECT $result FROM allpage";
-			$query .= " WHERE pagename = '$_pagename'";
-		}
-		else{
-			$_num = $num - 1;
-			$query  = "SELECT $result FROM pagebackup";
-			$query .= " WHERE pagename = '$_pagename'";
-			$query .= " ORDER BY number DESC LIMIT 1 OFFSET $_num";
-		}
-		$row = $db->fetch($db->query($query));
-		return $row !== false ? $row[0] : null;
+        $db = KinoWiki::getDatabase();
+        if ($num > 0) {
+            $num = $num - 1;
+            $stmt = $db->prepare("SELECT $result FROM pagebackup WHERE pagename=? ORDER BY number DESC LIMIT 1 OFFSET ?");
+            $stmt->execute(array($this->pagename, $num));
+        } else {
+            $stmt = $db->prepare("SELECT $result FROM allpage WHERE pagename=?");
+            $stmt->execute(array($this->pagename));
+        }
+        $row = $stmt->fetch();
+        return isset($row[$result])? $row[$result]: null;
 	}
 	
 	
