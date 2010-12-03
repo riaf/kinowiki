@@ -1,0 +1,184 @@
+/*
+Title: はてなダイアリー オレンジ色
+Author: ようか
+License: GPL
+based on はてなダイアリーのテーマ by はてな http://hatena.ne.jp/
+Comment: はてなダイアリーのテーマをkinowiki2向けに書き換えたもの。
+*/
+
+a,a:link{color:#FC7819;}
+a:visited{color:#FF952B;}
+
+div.header
+{
+	height: 150px;
+	margin: 0px 40px;
+}
+
+div.header div.menu
+{
+	margin: 1% 0px;
+	font-size: 90%;
+	text-align: right;
+}
+
+div.header div.topicpath
+{
+	margin: 1% 0px;
+	height: 1em;
+	text-align: right;
+	font-size: 90%;
+}
+
+div.header h1
+{
+	text-align: left;
+	font-size: 140%;
+	font-weight: bold;
+	border-style: dotted;
+	border-width: 0px 0px 1px 0px;
+	border-color: #FFD082;
+	margin: 10px 0px;
+	padding: 4px;
+}
+
+div.sidebar
+{
+	position: absolute;
+	top: 150px;
+	left: 0px;
+	margin: 0px 0px 0px 40px;
+	width: 200px;
+	padding: 8px;
+}
+
+div.main
+{
+	margin: 0px 40px 0px 256px;
+	padding: 0px;
+}
+
+div.main h2.title
+{
+	font-size: 100%;
+	color: #FC7819;
+	background-color: #FFD082;
+	padding: 3px 0px 2px 10px;
+	margin: 0px;
+}
+
+div.floatbox
+{
+	float: right;
+	width: 27%;
+	margin: 8px;
+	padding: 8px;
+	font-size: 90%;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #FFD082;
+}
+
+div.body
+{
+	border-style: solid;
+	border-width: 1px;
+	border-color: #FFD082;
+	margin: 0px;
+	padding: 4px 10px;
+	line-height: 1.4;
+}
+
+div.option
+{
+	margin: 0.5em 0px;
+	padding: 10px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #FFD082;
+	font-size: 90%;
+}
+
+div.footer
+{
+	margin: 1em 40px 1em 256px;
+	font-size: 90%;
+	text-align: center;
+	color: #cccccc;
+}
+
+div.footer a {
+	color: #cccccc;
+}
+
+span.sanchor {
+	color: #FFD082;
+}
+
+h3 {
+	font-size: 120%;
+	font-weight: bold;
+	margin: 2% 0px 0px 0px;
+}
+
+h4 {
+	font-size: 100%;
+	font-weight: bold;
+	margin: 0.6em 10% 0px 0.4em;
+	padding: 0px 0.5em 0.1em 0.5em;
+	border-style: solid;
+	border-width: 0px 0px 1px 5px;
+	border-color: #FFD082;
+}
+
+h5 {
+	font-size: 100%;
+	margin: 0.5em 0px 0px 0.7em;
+}
+
+h6 {
+	font-size: 90%;
+	margin: 0.5em 0px 0px 0px;
+}
+
+ul
+{
+	margin: 0.5em 0px;
+	padding: 0px 0px 0px 2em;
+}
+
+pre
+{
+	margin: 0.5em 2em;
+	padding: 8px;
+	background-color: #FFF6CD;
+}
+
+blockquote
+{
+	margin: 0.5em 2em;
+	padding: 2px 8px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #FFD082;
+}
+
+dt
+{
+	font-weight: bold;
+}
+
+hr
+{
+	border-style: solid;
+	border-width: 1px;
+	border-color: #FC7819;
+}
+
+table, tr, td, th{
+	border-color: #FFD082;
+}
+
+th{
+	background-color: #FFF6CD;
+}
