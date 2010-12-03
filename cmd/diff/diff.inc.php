@@ -3,8 +3,6 @@
  * $Id: diff.inc.php,v 1.2 2005/06/19 10:13:42 youka Exp $
  */
 
-
-
 class Command_diff extends Command
 {
 	public function do_url()
@@ -24,5 +22,3 @@ class Command_diff extends Command
 	}
 }
 
-
-?>

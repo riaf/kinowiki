@@ -3,8 +3,6 @@
  * $Id: backlink.inc.php,v 1.2 2005/07/18 02:27:16 youka Exp $
  */
 
-
-
 class Command_backlink extends Command
 {
 	function init()
@@ -76,5 +74,3 @@ class Command_backlink extends Command
 	}
 }
 
-
-?>

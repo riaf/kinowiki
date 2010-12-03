@@ -2,7 +2,6 @@
 /*
  * $Id: fuzzylink.inc.php,v 1.2 2005/07/12 00:02:19 youka Exp $
  */
-
  
 class Command_fuzzylink extends Command 
 {
@@ -84,4 +83,3 @@ class Command_fuzzylink extends Command
 	}
 }
 
-?>

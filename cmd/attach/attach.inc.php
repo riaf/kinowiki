@@ -3,8 +3,6 @@
  * $Id: attach.inc.php,v 1.3 2005/12/19 16:22:34 youka Exp $
  */
 
-
-
 class Command_attach extends Command implements MyObserver
 {
 	function init()
@@ -290,4 +288,3 @@ class Command_attach extends Command implements MyObserver
 	}
 }
 
-?>

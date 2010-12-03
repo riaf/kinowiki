@@ -3,8 +3,6 @@
  * $Id: backup.inc.php,v 1.2 2005/06/19 10:12:24 youka Exp $
  */
 
-
-
 class Command_backup extends Command
 {
 	function do_url()
@@ -204,5 +202,3 @@ class Command_backup extends Command
 	}
 }
 
-
-?>

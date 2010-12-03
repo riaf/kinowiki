@@ -3,8 +3,6 @@
  * $Id: edit.inc.php,v 1.2 2005/06/14 22:57:50 youka Exp $
  */
 
-
-
 class Command_edit extends Command 
 {
 	function do_url()
@@ -151,5 +149,3 @@ class Command_edit extends Command
 	}
 }
 
-
-?>

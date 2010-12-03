@@ -3,7 +3,6 @@
  * $Id: rename.inc.php,v 1.1.1.1 2005/06/12 15:37:46 youka Exp $
  */
 
-
 class Command_rename extends Command
 {
 	function do_url()
@@ -109,4 +108,3 @@ class Command_rename extends Command
 	}
 }
 
-?>

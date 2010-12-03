@@ -3,8 +3,6 @@
  * $Id: noindex.inc.php,v 1.1 2005/07/13 09:49:45 youka Exp $
  */
 
-
-
 class Command_noindex extends Command
 {
 	protected $noindex = true;
@@ -46,5 +44,3 @@ class Command_noindex extends Command
 	}
 }
 
-
-?>

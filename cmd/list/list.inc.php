@@ -3,8 +3,6 @@
  * $Id: list.inc.php,v 1.2 2005/06/19 12:26:09 youka Exp $
  */
 
-
-
 class Command_list extends Command 
 {
 	function do_url()
@@ -22,4 +20,3 @@ class Command_list extends Command
 	}
 }
 
-?>
