@@ -14,4 +14,3 @@ class Plugin_anchor extends Plugin
 	}
 }
 
-?>

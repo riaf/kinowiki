@@ -18,4 +18,3 @@ class Plugin_pre extends Plugin
 	}
 }
 
-?>

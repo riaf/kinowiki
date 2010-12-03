@@ -19,4 +19,3 @@ class Plugin_color extends Plugin
 	}
 }
 
-?>

@@ -61,4 +61,3 @@ class Plugin_counter extends Plugin
 	}
 }
 
-?>

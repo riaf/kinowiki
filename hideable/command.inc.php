@@ -125,5 +125,3 @@ class NoExistCommandException extends MyException
 	}
 }
 
-
-?>

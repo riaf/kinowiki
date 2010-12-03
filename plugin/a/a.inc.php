@@ -32,4 +32,3 @@ class Plugin_a extends Plugin
 	}
 }
 
-?>

@@ -3,7 +3,6 @@
  * $Id: kino1tokino2.inc.php,v 1.1 2005/07/14 08:30:29 youka Exp $
  */
 
-
 class Plugin_kino1tokino2 extends Plugin
 {
 	function do_url()
@@ -75,4 +74,3 @@ class Plugin_kino1tokino2 extends Plugin
 	}
 }
 
-?>

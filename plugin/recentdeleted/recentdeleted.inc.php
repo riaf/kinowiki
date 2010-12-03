@@ -29,4 +29,3 @@ class Plugin_recentdeleted extends Plugin implements MyObserver
 	}
 }
 
-?>

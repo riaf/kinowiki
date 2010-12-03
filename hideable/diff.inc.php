@@ -5,7 +5,6 @@
 require_once('Text/Diff.php');
 
 
-
 /**
  * 差分をわかりやすいようにして文字列を取得する。
  *
@@ -97,4 +96,3 @@ class DiffRenderer
 	}
 }
 
-?>

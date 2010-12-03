@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * DB管理クラス。シングルトンのように振舞う。
  * 
@@ -262,5 +261,3 @@ class DBException extends FatalException
 	}
 }
 
-
-?>

@@ -18,4 +18,3 @@ class Plugin_urlcall extends Plugin
 	}
 }
 
-?>

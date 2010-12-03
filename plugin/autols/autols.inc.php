@@ -3,8 +3,6 @@
  * $Id: autols.inc.php,v 1.2 2005/06/14 22:58:45 youka Exp $
  */
 
-
-
 class Plugin_autols extends Plugin
 {
 	const template = ':config/plugin/autols';
@@ -33,4 +31,3 @@ class Plugin_autols extends Plugin
 	}
 }
 
-?>

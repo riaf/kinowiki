@@ -21,4 +21,3 @@ class Plugin_outline extends Plugin
 	}
 }
 
-?>

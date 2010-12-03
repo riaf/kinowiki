@@ -26,4 +26,3 @@ class Plugin_hiddenpagelist extends Plugin
 	}
 }
 
-?>

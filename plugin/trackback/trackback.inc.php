@@ -186,4 +186,3 @@ class Plugin_trackback extends Plugin
 	}
 }
 
-?>

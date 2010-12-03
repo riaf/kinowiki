@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * ページ１つを表すクラス。
  * 
@@ -312,4 +311,3 @@ class PageException extends MyException
 	}
 }
 
-?>

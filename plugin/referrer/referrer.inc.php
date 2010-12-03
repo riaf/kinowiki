@@ -120,4 +120,3 @@ class Plugin_referrer extends Plugin
 	}
 }
 
-?>

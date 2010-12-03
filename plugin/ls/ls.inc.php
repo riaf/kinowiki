@@ -36,4 +36,3 @@ class Plugin_ls extends Plugin
 	}
 }
 
-?>

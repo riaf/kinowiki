@@ -223,4 +223,3 @@ class Plugin_tracker_field_select extends Plugin_tracker_field
 	}
 }
 
-?>

@@ -185,4 +185,3 @@ class NoExistPluginException extends MyException
 	}
 }
 
-?>

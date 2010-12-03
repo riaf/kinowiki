@@ -20,4 +20,3 @@ class Plugin_refcount extends Plugin
 	}
 }
 
-?>

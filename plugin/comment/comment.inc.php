@@ -3,8 +3,6 @@
  * $Id: comment.inc.php,v 1.2 2005/06/29 10:41:15 youka Exp $
  */
 
-
-
 class Plugin_comment extends Plugin
 {
 	function do_block($page, $param1, $param2)
@@ -77,4 +75,3 @@ class Plugin_comment extends Plugin
 	}
 }
 
-?>

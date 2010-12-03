@@ -11,4 +11,3 @@ class Plugin_del extends Plugin
 	}
 }
 
-?>

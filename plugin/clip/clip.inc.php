@@ -58,4 +58,4 @@ class Plugin_clip extends Plugin
 		redirect($page);
 	}
 }
-?>
+

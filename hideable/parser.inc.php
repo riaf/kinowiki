@@ -4,8 +4,6 @@
  */
 
 
-
-
 /**
  * Pageの内容ををhtmlに変換する。
  * 
@@ -1465,7 +1463,3 @@ class T_FuzzyLink extends T_InlineElement
 	}
 }
 
-
-
-
-?>

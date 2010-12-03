@@ -346,5 +346,3 @@ class Plugin_blog extends Plugin
 	}
 }
 
-
-?>

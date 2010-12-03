@@ -119,4 +119,3 @@ class MySmarty extends Smarty
 	}
 }
 
-?>

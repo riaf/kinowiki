@@ -3,7 +3,6 @@
  * $id: $
  */
 
-
 function errorhandler($errno, $errstr, $errfile, $errline, $errcontext)
 {
 	static $errortype = array(
@@ -44,4 +43,3 @@ function errorhandler($errno, $errstr, $errfile, $errline, $errcontext)
 
 set_error_handler('errorhandler');
 
-?>

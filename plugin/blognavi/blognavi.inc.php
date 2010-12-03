@@ -260,4 +260,4 @@ class Plugin_blognavi_ColumnList
 		return $this->date_col[$datepage];
 	}
 }
-?>
+

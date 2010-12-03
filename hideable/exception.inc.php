@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * 例外用クラス。続行可能な場合（他の処理に影響を及ぼす恐れがない場合）に使用する
  */
@@ -65,4 +64,3 @@ function saveexceptiondump($exc)
 	return $ret !== false ? true : false;
 }
 
-?>

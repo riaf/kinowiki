@@ -85,5 +85,3 @@ require_once(HIDEABLE_DIR . 'kinowiki.inc.php');
 
 KinoWiki::main();
 
-
-?>

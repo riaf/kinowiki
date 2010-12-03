@@ -24,4 +24,3 @@ class Plugin_cat extends Plugin
 	}
 }
 
-?>

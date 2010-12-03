@@ -11,4 +11,3 @@ class Plugin_right extends Plugin
 	}
 }
 
-?>

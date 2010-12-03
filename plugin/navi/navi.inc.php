@@ -60,4 +60,3 @@ class Plugin_navi extends Plugin
 	}
 }
 
-?>

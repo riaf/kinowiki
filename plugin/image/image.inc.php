@@ -3,8 +3,6 @@
  * $Id: image.inc.php,v 1.1.1.1 2005/06/12 15:38:46 youka Exp $
  */
 
-
-
 class Plugin_image extends Plugin
 {
 	static $type = array(
@@ -58,4 +56,3 @@ class Plugin_image extends Plugin
 	}
 }
 
-?>

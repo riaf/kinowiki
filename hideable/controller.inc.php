@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * CommandとPluginのもととなるクラス。
  * 派生させたCommandとPluginはシングルトンとする。
@@ -134,5 +133,3 @@ abstract class Controller implements Notifier
 	}
 }
 
-
-?>

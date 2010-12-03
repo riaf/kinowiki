@@ -1714,4 +1714,3 @@ $itaimojitable = array(
 '麸' => '[麩麸]'
 );
 
-?>

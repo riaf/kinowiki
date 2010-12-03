@@ -13,4 +13,3 @@ class Plugin_blockquote extends Plugin
 	}
 }
 
-?>

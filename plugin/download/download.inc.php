@@ -16,4 +16,3 @@ class Plugin_download extends Plugin
 	}
 }
 
-?>

@@ -58,4 +58,3 @@ class Plugin_blogrss10 extends Plugin
 	}
 }
 
-?>

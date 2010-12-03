@@ -14,4 +14,3 @@ class Plugin_theme extends Plugin
 	}
 }
 
-?>

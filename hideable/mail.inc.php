@@ -160,4 +160,3 @@ class Mail implements MyObserver
 	}
 }
 
-?>

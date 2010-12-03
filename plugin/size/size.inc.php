@@ -20,4 +20,3 @@ class Plugin_size extends Plugin
 	}
 }
 
-?>

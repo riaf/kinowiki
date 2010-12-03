@@ -89,4 +89,3 @@ class Plugin_puki2kino extends Plugin
 	}
 }
 
-?>

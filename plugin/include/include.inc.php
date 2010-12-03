@@ -19,5 +19,3 @@ class Plugin_include extends Plugin
 	}
 }
 
-
-?>

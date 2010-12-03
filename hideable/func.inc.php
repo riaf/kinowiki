@@ -466,4 +466,3 @@ function tagparam2array($param)
 	return $ret;
 }
 
-?>

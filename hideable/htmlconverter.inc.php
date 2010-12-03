@@ -2,7 +2,6 @@
 /*
  * $Id: htmlconverter.inc.php,v 1.6 2005/09/06 01:14:55 youka Exp $
  */
-
  
 
 /**
@@ -412,5 +411,3 @@ class Footnote
 	}
 }
 
-
-?>

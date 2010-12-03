@@ -55,4 +55,3 @@ class Plugin_rss10 extends Plugin
 	}
 }
 
-?>

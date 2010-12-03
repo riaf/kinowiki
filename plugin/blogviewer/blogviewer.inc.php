@@ -54,5 +54,3 @@ class Plugin_blogviewer extends Plugin
 	}
 }
 
-
-?>

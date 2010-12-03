@@ -101,4 +101,3 @@ class Plugin_rss extends Plugin
 	}
 }
 
-?>

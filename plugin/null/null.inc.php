@@ -17,4 +17,3 @@ class Plugin_null extends Plugin
 	}
 }
 
-?>

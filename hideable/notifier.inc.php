@@ -4,7 +4,6 @@
  */
 
 
-
 /**
  * 更新通知クラスのインターフェース。
  */
@@ -92,4 +91,3 @@ class NotifierImpl implements Notifier
 	}
 }
 
-?>
